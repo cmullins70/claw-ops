@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 #
-# Claw Ops ↔ OpenClaw Integration Checklist
+# Claw Ops <> OpenClaw Integration Checklist
 #
 # Walks through the steps to connect a running Claw Ops stack to an
 # existing OpenClaw installation on the same (or a reachable) host.
@@ -129,13 +129,13 @@ echo "    - targets: ['http://${OPENCLAW_HOST:-<HOST_IP>}:<PORT>/health']"
 echo ""
 
 # ---------------------------------------------------------------
-header "Step 5: Alertmanager → Event Processor"
+header "Step 5: Alertmanager -> Event Processor"
 # ---------------------------------------------------------------
 
 check "Alertmanager routes to event processor" \
   grep -q "claw-ops-event-processor:8787" "$DEPLOY_DIR/config/alertmanager/alertmanager.yml"
 
-echo "  Alerts fire from Prometheus → Alertmanager → Claw Ops webhook."
+echo "  Alerts fire from Prometheus -> Alertmanager -> Claw Ops webhook."
 echo "  This is pre-configured. No action needed unless you changed ports."
 
 # ---------------------------------------------------------------
@@ -179,15 +179,21 @@ else
 fi
 
 # ---------------------------------------------------------------
-header "Step 7: Verify log ingestion (if Loki enabled)"
+header "Step 7: Optional add-ons"
 # ---------------------------------------------------------------
 
+echo "The following are optional and not required for core Claw Ops:"
+echo ""
+
+# Check if Loki overlay is active
 if curl -sf http://127.0.0.1:3101/ready > /dev/null 2>&1; then
-  green "Loki is ready"
-  echo "  Promtail is configured to ingest /var/log and Docker container logs."
-  echo "  To include OpenClaw logs, ensure its containers log to the Docker json driver."
+  green "Loki is running (log ingestion active)"
+  echo "  Promtail ingests /var/log and Docker container logs."
+  echo "  Ensure OpenClaw containers use the Docker json log driver."
 else
-  yellow "Loki is not ready or not running (optional for Phase 1)"
+  yellow "Loki is not running (this is normal for default installs)"
+  echo "  To enable log ingestion, start with the Loki overlay:"
+  echo "    docker compose -f docker-compose.phase1.yml -f docker-compose.loki.yml up -d"
   SKIP=$((SKIP + 1))
 fi
 
