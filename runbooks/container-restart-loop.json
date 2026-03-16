@@ -1,0 +1,45 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "container_restart_loop_v1",
+  "name": "Container restart loop",
+  "triggers": [
+    "container restart count exceeds threshold in rolling window",
+    "repeated exit events detected"
+  ],
+  "facts_to_gather": [
+    "restart count over time",
+    "last exit code",
+    "recent container logs",
+    "host memory and disk pressure",
+    "deploy or config changes preceding loop"
+  ],
+  "classification_rules": [
+    "if exit code is 137 and host memory pressure is high then likely oom_or_memory_pressure",
+    "if restart loop begins immediately after deploy then likely bad_config_or_startup_path",
+    "if disk nearly full then likely write_or_start_failure"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_logs",
+    "diagnostics.collect_metrics_snapshot",
+    "incident.annotate"
+  ],
+  "approval_gated_actions": [
+    "container.restart",
+    "cron.pause"
+  ],
+  "human_only_actions": [
+    "secrets.rotate",
+    "host.package_upgrade"
+  ],
+  "verification_checks": [
+    "restart count stabilizes",
+    "container remains healthy for configured interval",
+    "memory or disk pressure is reduced or stable"
+  ],
+  "improvement_prompts": [
+    "Should memory limits or alerts be adjusted?",
+    "Do we need pre-deploy health validation?",
+    "Should this incident auto-correlate with disk and memory metrics?"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "memory_retrieval_degradation_v1",
+  "name": "Memory retrieval degradation",
+  "triggers": [
+    "retrieval latency spikes",
+    "retrieval usefulness falls",
+    "irrelevant memory repeatedly included in prompts",
+    "memory lookup errors increase"
+  ],
+  "facts_to_gather": [
+    "retrieval latency and hit counts",
+    "source documents retrieved",
+    "usefulness markers or human corrections",
+    "memory corpus size and recent growth",
+    "repeated retrieval patterns by workflow"
+  ],
+  "classification_rules": [
+    "if corpus becomes noisy and irrelevant hits rise then likely curation_or_index_problem",
+    "if latency rises after corpus growth then likely scaling_or_index_issue",
+    "if same wrong memories repeat then likely ranking_or_scope_problem"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_metrics_snapshot",
+    "incident.annotate",
+    "learning.create_lesson_candidate"
+  ],
+  "approval_gated_actions": [
+    "cron.pause"
+  ],
+  "human_only_actions": [
+    "storage.delete_durable_data"
+  ],
+  "verification_checks": [
+    "retrieval latency improves",
+    "irrelevant hit rate declines",
+    "user-facing workflow quality improves if measurable"
+  ],
+  "improvement_prompts": [
+    "Should memory be tiered more aggressively?",
+    "Should stale notes be archived?",
+    "Should retrieval be scoped differently by workflow?"
+  ]
+}

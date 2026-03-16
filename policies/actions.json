@@ -1,0 +1,54 @@
+{
+  "schema_name": "claw-ops.policy-actions",
+  "schema_version": "0.1.0",
+  "actions": [
+    {
+      "policy_id": "gateway_restart",
+      "action": "gateway.restart",
+      "class": "approval_gated",
+      "preconditions": ["incident.components includes gateway"],
+      "rollback": "Restart previous service state if possible.",
+      "verification": ["gateway healthcheck passes within 60 seconds"]
+    },
+    {
+      "policy_id": "container_restart",
+      "action": "container.restart",
+      "class": "approval_gated",
+      "preconditions": ["incident.components includes container"],
+      "rollback": "Revert to previous container state if supported.",
+      "verification": ["container healthy for configured interval"]
+    },
+    {
+      "policy_id": "cron_pause",
+      "action": "cron.pause",
+      "class": "approval_gated",
+      "preconditions": ["incident.root_cause_class == cron_failure or incident evidence implicates cron load"],
+      "rollback": "Re-enable paused cron job.",
+      "verification": ["no new cron runs occur during pause window"]
+    },
+    {
+      "policy_id": "storage_prune_temp",
+      "action": "storage.prune_temp",
+      "class": "approval_gated",
+      "preconditions": ["incident.root_cause_class == disk_pressure"],
+      "rollback": "No rollback guaranteed; limit action to temp/cached data only.",
+      "verification": ["disk usage trend flattens or decreases"]
+    },
+    {
+      "policy_id": "collect_logs",
+      "action": "diagnostics.collect_logs",
+      "class": "autonomous",
+      "preconditions": ["incident exists"],
+      "rollback": "No rollback required.",
+      "verification": ["log bundle or excerpt attached to incident"]
+    },
+    {
+      "policy_id": "collect_metrics_snapshot",
+      "action": "diagnostics.collect_metrics_snapshot",
+      "class": "autonomous",
+      "preconditions": ["incident exists"],
+      "rollback": "No rollback required.",
+      "verification": ["metrics snapshot attached to incident"]
+    }
+  ]
+}

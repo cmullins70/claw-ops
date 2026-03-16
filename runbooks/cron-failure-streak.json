@@ -1,0 +1,43 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "cron_failure_streak_v1",
+  "name": "Cron failure streak",
+  "triggers": [
+    "same cron or job fails multiple times in a row",
+    "scheduled task misses expected success window"
+  ],
+  "facts_to_gather": [
+    "last successful run",
+    "last N failures",
+    "error output or logs",
+    "external dependency status",
+    "overlapping jobs and load conditions"
+  ],
+  "classification_rules": [
+    "if error text is auth-related then likely credential_or_connector_drift",
+    "if timeout occurs under heavy load then likely overlap_or_resource_contention",
+    "if repeated schema or tooling failure then likely integration_contract_drift"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_job_history",
+    "diagnostics.collect_logs",
+    "incident.annotate"
+  ],
+  "approval_gated_actions": [
+    "cron.pause"
+  ],
+  "human_only_actions": [
+    "secrets.rotate"
+  ],
+  "verification_checks": [
+    "next run succeeds",
+    "failure streak resets",
+    "correlated system pressure subsides if causal"
+  ],
+  "improvement_prompts": [
+    "Should this cron emit richer structured outcomes?",
+    "Should overlapping jobs be staggered by policy?",
+    "Should auth drift have its own pre-incident detector?"
+  ]
+}

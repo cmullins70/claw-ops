@@ -1,0 +1,13 @@
+route:
+  receiver: claw-ops-webhook
+  group_by: [alertname, component]
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 2h
+
+receivers:
+  - name: claw-ops-webhook
+    webhook_configs:
+      - url: http://claw-ops-event-processor:8787/webhooks/alertmanager
+        send_resolved: true
+        http_config: {}

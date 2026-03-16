@@ -1,0 +1,43 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "provider_latency_v1",
+  "name": "Provider latency degradation",
+  "triggers": [
+    "model or provider latency exceeds threshold",
+    "request timeout rate increases",
+    "responses slow without corresponding host pressure"
+  ],
+  "facts_to_gather": [
+    "provider latency p50 and p95 trend",
+    "timeout and retry counts",
+    "host CPU and memory state",
+    "prompt size trend",
+    "concurrent workflow volume"
+  ],
+  "classification_rules": [
+    "if provider latency rises while host and prompt are stable then likely provider_issue",
+    "if provider latency rises and prompt size rises sharply then prompt_amplification_may_be_primary_or_contributing",
+    "if latency and retries surge together then likely upstream_instability"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_metrics_snapshot",
+    "incident.annotate"
+  ],
+  "approval_gated_actions": [
+    "cron.pause"
+  ],
+  "human_only_actions": [
+    "model.change_global_provider"
+  ],
+  "verification_checks": [
+    "latency returns toward baseline",
+    "timeout rate declines",
+    "response success rate improves"
+  ],
+  "improvement_prompts": [
+    "Do we need provider-specific SLOs?",
+    "Should prompt size be part of provider latency triage every time?",
+    "Do we need failover policies for premium workflows?"
+  ]
+}

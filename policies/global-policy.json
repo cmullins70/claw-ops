@@ -1,0 +1,49 @@
+{
+  "schema_name": "claw-ops.policy-set",
+  "schema_version": "0.1.0",
+  "name": "global-policy",
+  "description": "Global action classes and guardrails for Claw Ops MVP.",
+  "classes": {
+    "autonomous": [
+      "diagnostics.collect_logs",
+      "diagnostics.collect_metrics_snapshot",
+      "diagnostics.collect_job_history",
+      "incident.annotate",
+      "incident.suppress_duplicates",
+      "healthcheck.rerun_readonly",
+      "learning.create_lesson_candidate",
+      "learning.create_improvement_candidate"
+    ],
+    "approval_gated": [
+      "gateway.restart",
+      "container.restart",
+      "cron.pause",
+      "storage.prune_temp",
+      "logging.reduce_retention",
+      "observability.restart_noncore_service"
+    ],
+    "human_only": [
+      "network.change_firewall",
+      "access.change_ssh",
+      "secrets.rotate",
+      "host.package_upgrade",
+      "storage.delete_durable_data",
+      "model.change_global_provider",
+      "backup.change_retention_or_restore"
+    ]
+  },
+  "guardrails": [
+    "Always gather diagnostics before proposing remediation unless explicitly exempted by runbook.",
+    "Always verify after any executed action.",
+    "Never expose secrets in summaries, lessons, or improvements.",
+    "Never repeat the same autonomous action indefinitely; use retry budgets.",
+    "Escalate when confidence is low, evidence conflicts, or remediation fails.",
+    "Treat observability impairment as its own incident class."
+  ],
+  "retry_policy": {
+    "autonomous_diagnostics_max_retries": 2,
+    "autonomous_remediation_max_retries": 0,
+    "approval_gated_reproposal_cooldown_minutes": 15,
+    "duplicate_summary_suppression_minutes": 15
+  }
+}

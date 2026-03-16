@@ -1,0 +1,46 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "prompt_token_anomaly_v1",
+  "name": "Prompt or token anomaly",
+  "triggers": [
+    "prompt tokens exceed threshold for workflow baseline",
+    "token cost spikes beyond configured budget band",
+    "prompt size p95 regresses sharply"
+  ],
+  "facts_to_gather": [
+    "workflow or session involved",
+    "prompt token trend",
+    "completion token trend",
+    "memory retrieval count and size",
+    "repeated file reads or tool outputs",
+    "concurrent cron or subagent conditions"
+  ],
+  "classification_rules": [
+    "if retrieval count rises sharply then likely retrieval_overfetch",
+    "if repeated large file reads occur then likely context_duplication",
+    "if overlapping background workflows exist then likely schedule_or_design_issue",
+    "if completion spike occurs without prompt spike then likely downstream_verbosity_issue"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_metrics_snapshot",
+    "incident.annotate",
+    "learning.create_improvement_candidate"
+  ],
+  "approval_gated_actions": [
+    "cron.pause"
+  ],
+  "human_only_actions": [
+    "model.change_global_provider"
+  ],
+  "verification_checks": [
+    "prompt and token levels return toward baseline",
+    "workflow still completes successfully",
+    "latency and cost impact improve"
+  ],
+  "improvement_prompts": [
+    "Should this workflow become a specialist agent?",
+    "Should retrieval limits be tightened?",
+    "Should repeated file contexts be summarized or cached?"
+  ]
+}

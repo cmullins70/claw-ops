@@ -1,0 +1,38 @@
+groups:
+  - name: claw-ops-baseline
+    rules:
+      - alert: HostDiskPressureHigh
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+          component: host
+        annotations:
+          summary: "Root disk free space below 15%"
+
+      - alert: HostMemoryPressureHigh
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.10
+        for: 5m
+        labels:
+          severity: warning
+          component: host
+        annotations:
+          summary: "Available host memory below 10%"
+
+      - alert: ContainerRestartLoopSuspected
+        expr: increase(container_start_time_seconds[15m]) > 2
+        for: 5m
+        labels:
+          severity: high
+          component: container
+        annotations:
+          summary: "Container restart loop suspected"
+
+      - alert: Claw OpsEventProcessorDown
+        expr: probe_success{job="blackbox-http"} == 0
+        for: 2m
+        labels:
+          severity: high
+          component: gateway
+        annotations:
+          summary: "Claw Ops event processor healthcheck failed"

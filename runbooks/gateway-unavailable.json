@@ -1,0 +1,48 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "gateway_unavailable_v1",
+  "name": "Gateway unavailable",
+  "triggers": [
+    "gateway healthcheck failed",
+    "OpenClaw status endpoint unavailable",
+    "repeated inbound failures suggest gateway unreachability"
+  ],
+  "facts_to_gather": [
+    "gateway process or container status",
+    "recent gateway logs",
+    "host reachability",
+    "recent deploy, config, or restart evidence",
+    "reverse proxy or ingress signals if present"
+  ],
+  "classification_rules": [
+    "if host unreachable then likely host_or_network_issue",
+    "if host reachable and container stopped then likely container_or_process_failure",
+    "if process up but healthcheck failing then likely application_or_dependency_issue"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_logs",
+    "diagnostics.collect_metrics_snapshot",
+    "incident.annotate",
+    "healthcheck.rerun_readonly"
+  ],
+  "approval_gated_actions": [
+    "gateway.restart",
+    "container.restart"
+  ],
+  "human_only_actions": [
+    "network.change_firewall",
+    "access.change_ssh",
+    "model.change_global_provider"
+  ],
+  "verification_checks": [
+    "gateway healthcheck passes within 60 seconds",
+    "inbound error rate falls",
+    "no immediate restart loop resumes"
+  ],
+  "improvement_prompts": [
+    "Was there an earlier warning signal we failed to surface?",
+    "Should gateway dependency health be monitored separately?",
+    "Should a safe restart path be automated after approval?"
+  ]
+}

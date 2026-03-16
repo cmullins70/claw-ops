@@ -1,0 +1,46 @@
+{
+  "schema_name": "claw-ops.runbook",
+  "schema_version": "0.1.0",
+  "runbook_id": "disk_pressure_v1",
+  "name": "Disk pressure high",
+  "triggers": [
+    "disk usage exceeds warning or critical threshold",
+    "inode usage exceeds threshold"
+  ],
+  "facts_to_gather": [
+    "top growing paths",
+    "recent log volume growth",
+    "artifact, transcript, or temp growth",
+    "Loki or retention growth if applicable",
+    "available inodes and write failures"
+  ],
+  "classification_rules": [
+    "if logs are growing rapidly then likely retention_or_verbosity_issue",
+    "if temp artifacts are growing then likely cleanup_or_retention_issue",
+    "if container overlay grows rapidly then likely image_or_runtime_issue"
+  ],
+  "autonomous_actions": [
+    "diagnostics.collect_metrics_snapshot",
+    "incident.annotate",
+    "healthcheck.rerun_readonly"
+  ],
+  "approval_gated_actions": [
+    "storage.prune_temp",
+    "logging.reduce_retention",
+    "container.restart"
+  ],
+  "human_only_actions": [
+    "storage.delete_durable_data",
+    "backup.change_retention_or_restore"
+  ],
+  "verification_checks": [
+    "disk usage trend flattens or drops",
+    "write failures stop",
+    "no critical service remains at imminent risk"
+  ],
+  "improvement_prompts": [
+    "Should retention be lowered?",
+    "Should large artifact classes be isolated onto separate storage?",
+    "Should disk growth per path be monitored continuously?"
+  ]
+}
