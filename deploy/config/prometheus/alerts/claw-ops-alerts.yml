@@ -33,7 +33,7 @@ groups:
         for: 2m
         labels:
           severity: high
-          component: gateway
+          component: container
         annotations:
           summary: "Claw Ops event processor healthcheck failed"
 
