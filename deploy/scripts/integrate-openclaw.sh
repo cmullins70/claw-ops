@@ -167,7 +167,7 @@ if echo "$TEST_RESULT" | grep -q '"accepted":true'; then
 
   # Verify it created an incident
   INCIDENTS=$(curl -sf http://127.0.0.1:8787/incidents 2>&1 || echo "")
-  if echo "$INCIDENTS" | grep -q "IntegrationTestAlert"; then
+  if echo "$INCIDENTS" | grep -q "Integration checklist test alert"; then
     green "Test incident created and visible at /incidents"
   else
     red "Test incident not found at /incidents"
