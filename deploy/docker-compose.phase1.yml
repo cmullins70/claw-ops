@@ -4,7 +4,7 @@ services:
     container_name: claw-ops-grafana
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3001:3000"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:3001:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me}
@@ -29,7 +29,7 @@ services:
     container_name: claw-ops-prometheus
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9091:9090"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:9091:9090"
     volumes:
       - ./config/prometheus/prometheus.phase1.yml:/etc/prometheus/prometheus.yml:ro
       - ./config/prometheus/alerts:/etc/prometheus/alerts:ro
@@ -53,7 +53,7 @@ services:
     container_name: claw-ops-alertmanager
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9094:9093"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:9094:9093"
     volumes:
       - ./config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager-data:/alertmanager
@@ -77,7 +77,7 @@ services:
     container_name: claw-ops-node-exporter
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9101:9100"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:9101:9100"
     pid: host
     volumes:
       - /proc:/host/proc:ro
@@ -95,7 +95,7 @@ services:
     container_name: claw-ops-cadvisor
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8081:8080"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:8081:8080"
     privileged: true
     devices:
       - /dev/kmsg:/dev/kmsg
@@ -112,7 +112,7 @@ services:
     container_name: claw-ops-blackbox
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9116:9115"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:9116:9115"
     volumes:
       - ./config/blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
     command:
@@ -128,7 +128,7 @@ services:
     container_name: claw-ops-event-processor
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8787:8787"
+      - "${CLAW_OPS_BIND:-127.0.0.1}:8787:8787"
     environment:
       NODE_ENV: production
       CLAW_OPS_PORT: "8787"
