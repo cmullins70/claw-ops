@@ -8,8 +8,6 @@
 # Enable this if your OpenClaw deployment uses Loki for log aggregation
 # or if you want container/host log search in Grafana.
 
-version: "3.9"
-
 services:
   loki:
     image: grafana/loki:3.1.1
