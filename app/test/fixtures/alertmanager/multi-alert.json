@@ -1,0 +1,35 @@
+{
+  "version": "4",
+  "groupKey": "{}:{alertname=\"mixed\"}",
+  "status": "firing",
+  "receiver": "claw-ops-webhook",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "ClawOpsEventProcessorDown",
+        "severity": "high",
+        "component": "gateway"
+      },
+      "annotations": {
+        "summary": "Claw Ops event processor is not responding to health checks"
+      },
+      "startsAt": "2026-03-16T14:00:00.000Z",
+      "endsAt": "0001-01-01T00:00:00Z"
+    },
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "HostMemoryPressureHigh",
+        "severity": "warning",
+        "component": "host",
+        "instance": "kyra-nest:9100"
+      },
+      "annotations": {
+        "summary": "Available memory below 10% for over 5 minutes"
+      },
+      "startsAt": "2026-03-16T14:01:00.000Z",
+      "endsAt": "0001-01-01T00:00:00Z"
+    }
+  ]
+}

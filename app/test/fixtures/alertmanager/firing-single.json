@@ -1,0 +1,39 @@
+{
+  "version": "4",
+  "groupKey": "{}:{alertname=\"HostDiskPressureHigh\"}",
+  "status": "firing",
+  "receiver": "claw-ops-webhook",
+  "groupLabels": {
+    "alertname": "HostDiskPressureHigh"
+  },
+  "commonLabels": {
+    "alertname": "HostDiskPressureHigh",
+    "severity": "warning",
+    "component": "host",
+    "instance": "kyra-nest:9100",
+    "job": "node-exporter"
+  },
+  "commonAnnotations": {
+    "summary": "Root disk has less than 15% free space",
+    "description": "The root filesystem on kyra-nest is running low on disk space."
+  },
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "HostDiskPressureHigh",
+        "severity": "warning",
+        "component": "host",
+        "instance": "kyra-nest:9100",
+        "job": "node-exporter"
+      },
+      "annotations": {
+        "summary": "Root disk has less than 15% free space",
+        "description": "The root filesystem on kyra-nest is running low on disk space."
+      },
+      "startsAt": "2026-03-16T10:00:00.000Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus:9090/graph?g0.expr=..."
+    }
+  ]
+}
