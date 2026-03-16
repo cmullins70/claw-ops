@@ -28,11 +28,20 @@ groups:
         annotations:
           summary: "Container restart loop suspected"
 
-      - alert: Claw OpsEventProcessorDown
-        expr: probe_success{job="blackbox-http"} == 0
+      - alert: ClawOpsEventProcessorDown
+        expr: probe_success{job="blackbox-http",instance=~".*8787.*"} == 0
         for: 2m
         labels:
           severity: high
           component: gateway
         annotations:
           summary: "Claw Ops event processor healthcheck failed"
+
+      - alert: OpenClawGatewayDown
+        expr: probe_success{job="blackbox-http",instance=~".*18789.*"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: gateway
+        annotations:
+          summary: "OpenClaw gateway is not responding to health probes"
