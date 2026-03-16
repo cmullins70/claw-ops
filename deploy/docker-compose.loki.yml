@@ -51,10 +51,6 @@ services:
         condition: service_healthy
       loki:
         condition: service_healthy
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./config/grafana/provisioning-loki/datasources/loki.yml:/etc/grafana/provisioning/datasources/loki.yml:ro
 
 volumes:
   loki-data:

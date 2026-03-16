@@ -6,3 +6,9 @@ datasources:
     access: proxy
     url: http://prometheus:9090
     isDefault: true
+
+  # Available when Loki overlay is active; harmless if Loki is not running
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
