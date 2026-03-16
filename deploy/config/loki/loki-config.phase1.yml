@@ -9,6 +9,12 @@ common:
   ring:
     kvstore:
       store: inmemory
+    instance_addr: 127.0.0.1
+
+ingester:
+  chunk_encoding: snappy
+  wal:
+    dir: /loki/wal
 
 schema_config:
   configs:
