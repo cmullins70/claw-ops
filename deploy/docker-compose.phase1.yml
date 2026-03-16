@@ -9,16 +9,24 @@ services:
       - "127.0.0.1:3001:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: change-me
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me}
       GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
-      - ./data/grafana:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
       - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
-      - prometheus
-      - loki
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_started
     mem_limit: 512m
     cpus: 0.50
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -29,7 +37,7 @@ services:
     volumes:
       - ./config/prometheus/prometheus.phase1.yml:/etc/prometheus/prometheus.yml:ro
       - ./config/prometheus/alerts:/etc/prometheus/alerts:ro
-      - ./data/prometheus:/prometheus
+      - prometheus-data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -37,6 +45,12 @@ services:
       - "--web.enable-lifecycle"
     mem_limit: 768m
     cpus: 0.75
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   alertmanager:
     image: prom/alertmanager:v0.27.0
@@ -46,12 +60,21 @@ services:
       - "127.0.0.1:9094:9093"
     volumes:
       - ./config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-      - ./data/alertmanager:/alertmanager
+      - alertmanager-data:/alertmanager
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--storage.path=/alertmanager"
+    depends_on:
+      claw-ops-event-processor:
+        condition: service_healthy
     mem_limit: 128m
     cpus: 0.25
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9093/-/healthy || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   loki:
     image: grafana/loki:3.1.1
@@ -61,10 +84,16 @@ services:
       - "127.0.0.1:3101:3100"
     volumes:
       - ./config/loki/loki-config.phase1.yml:/etc/loki/local-config.yaml:ro
-      - ./data/loki:/loki
+      - loki-data:/loki
     command: ["-config.file=/etc/loki/local-config.yaml"]
     mem_limit: 512m
     cpus: 0.50
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3100/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   promtail:
     image: grafana/promtail:3.1.1
@@ -77,7 +106,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: ["-config.file=/etc/promtail/config.yml"]
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
     mem_limit: 256m
     cpus: 0.25
 
@@ -130,24 +160,35 @@ services:
     cpus: 0.10
 
   claw-ops-event-processor:
-    image: node:20-alpine
+    build:
+      context: ../app
+      dockerfile: Dockerfile
+    image: claw-ops-event-processor:phase1
     container_name: claw-ops-event-processor
     restart: unless-stopped
-    working_dir: /app
-    command: ["sh", "-c", "echo 'Replace with real app startup'; tail -f /dev/null"]
     ports:
       - "127.0.0.1:8787:8787"
     environment:
       NODE_ENV: production
+      CLAW_OPS_PORT: "8787"
       CLAW_OPS_DB_PATH: /data/claw-ops.sqlite
-      CLAW_OPS_SHARED_SECRET: change-me
+      CLAW_OPS_SHARED_SECRET: ${CLAW_OPS_SHARED_SECRET:?Set CLAW_OPS_SHARED_SECRET in .env}
+      CLAW_OPS_POLICIES_DIR: /policies
+      CLAW_OPS_RUNBOOKS_DIR: /runbooks
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
-      - ./app:/app
-      - ./data/claw-ops:/data
-      - ./policies:/app/policies:ro
-      - ./runbooks:/app/runbooks:ro
+      - claw-ops-data:/data
+      - ../policies:/policies:ro
+      - ../runbooks:/runbooks:ro
     mem_limit: 256m
     cpus: 0.25
+
+volumes:
+  grafana-data:
+  prometheus-data:
+  alertmanager-data:
+  loki-data:
+  claw-ops-data:
 
 networks:
   default:

@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const DEFAULTS = {
@@ -7,6 +7,8 @@ const DEFAULTS = {
   CLAW_OPS_DB_PATH: './data/claw-ops.sqlite',
   CLAW_OPS_SHARED_SECRET: '',
   LOG_LEVEL: 'info',
+  // In container: env vars set by Dockerfile (/policies, /runbooks)
+  // Local dev: resolve relative to app/ working directory
   CLAW_OPS_POLICIES_DIR: resolve(process.cwd(), '../policies'),
   CLAW_OPS_RUNBOOKS_DIR: resolve(process.cwd(), '../runbooks'),
 };
